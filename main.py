@@ -1,9 +1,9 @@
 ## 5by5 - A Richard Kil joint - last updated: 160131
 #########################
-### Variables that are decided when playing the game:
+### Variables that are decided before running the game:
 #########################
 max_players = 4		#max number of players
-points_goal = 10 	#points threshold above which the game ends
+points_goal = 100 	#points threshold above which the game ends
 num_blanks = 2  	#how many blanks in letter distribution. raise for more randomness
 #########################
 ### Points per letter
