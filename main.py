@@ -139,7 +139,7 @@ def take_turn(whose_turn):
 		# Something should go here that returns the word once all the checks have been done
 		# and the word is decided to be successful. This will then allow the word_score to be 
 		# decided outside this loop.
-								break
+									break
 								print "That word is not in the dictionary."
 							else:
 								print "That word is not valid."
