@@ -1,10 +1,11 @@
-## 5by5 - A Richard Kil joint - last updated: 160131
+## 5by5 - A Richard Kil joint - last updated: 160209
 #########################
 ### Variables that are decided before running the game:
 #########################
 max_players = 4		#max number of players
 points_goal = 100 	#points threshold above which the game ends
 num_blanks = 2  	#how many blanks in letter distribution. raise for more randomness
+#SHOULD ADD a prompt of what dictionary should be played with.
 #########################
 ### Points per letter
 letter_points = {'A':1,'B':3,'C':3,'D':2,'E':1,'F':4,'G':2,'H':4,'I':1,
@@ -14,7 +15,7 @@ letter_points = {'A':1,'B':3,'C':3,'D':2,'E':1,'F':4,'G':2,'H':4,'I':1,
 let_distr = {'A':9,'B':2,'C':2,'D':4,'E':12,'F':2,'G':3,'H':2,'I':9,
 			'J':1,'K':1,'L':4,'M':2,'N':6,'O':8,'P':2,'Q':1,'R':6,
 			'S':4,'T':6,'U':4,'V':2,'W':2,'X':1,'Y':2,'Z':1} 
-# standard scrabble distribution: 
+# standard scrabble distribution:
 #	let_distr = {'A':9,'B':2,'C':2,'D':4,'E':12,'F':2,'G':3,'H':2,'I':9,
 #	'J':1,'K':1,'L':4,'M':2,'N':6,'O':8,'P':2,'Q':1,'R':6,
 #	'S':4,'T':6,'U':4,'V':2,'W':2,'X':1,'Y':2,'Z':1} 
@@ -34,6 +35,35 @@ distr = ""
 for key in let_distr:
     distr += key*let_distr[key]
 #########################
+#########################
+en = "_"
+def make_dict():	
+	f = open("SOWPODS.txt","U")
+	trie = {}
+	for word in f:
+		current = trie
+		for letter in word.strip():
+			current = current.setdefault(letter,{})
+		current[en] = en
+	f.close()
+	return trie
+
+def in_dict(trie,word):
+	current = trie
+	for letter in word:
+		if letter in current:
+			current = current[letter]
+		else:
+			return False
+	else:
+		if en in current:
+			return True
+		else:
+			return False
+
+#########################
+#########################
+
 def assign_players():
 	while True:
 	    try:
@@ -104,13 +134,15 @@ def take_turn(whose_turn):
 						if all(x in(board[0]+board[1]+board[2]+board[3]+board[4]) for x in played_word):
 	#########################
 							if is_it_there(turn_let,played_word,path):
-								player_scores[whose_turn] += word_score(played_word)  ##THIS SHOULD BE MOVED But Played_word is not global
-	# The final check should be if the word is in the dictionary.
+								if in_dict(sowpods,played_word):
+									player_scores[whose_turn] += word_score(played_word)  ##THIS SHOULD BE MOVED But Played_word is not global
+		# Something should go here that returns the word once all the checks have been done
+		# and the word is decided to be successful. This will then allow the word_score to be 
+		# decided outside this loop.
 								break
-	# Something should go here that returns the word once all the checks have been done
-	# and the word is decided to be successful. This will then allow the word_score to be 
-	# decided outside this loop.
-							print "That word is not valid."
+								print "That word is not in the dictionary."
+							else:
+								print "That word is not valid."
 	#########################
 						else:
 							print "A letter is missing."
@@ -264,14 +296,12 @@ def word_score(played_word):
 	word_score += len_val[str(len(played_word))]
 	return word_score
 
-
 #########################
 #########################
-
-
 #########################
 ### THIS IS WHERE THE GAME STARTS
 #########################
+sowpods = make_dict() # want to allow this to be decided at some point.
 assign_players()
 print "Welcome", " & ".join(player_list)
 print "The winner is the first to", str(points_goal), "points.\n\n"
@@ -299,7 +329,6 @@ while True:
 		break
 
 	print player_list[whose_turn] + "s new hand: " + " & ".join(player_hands[whose_turn]) + ".\n\n"
-
 	row_flip()
 	print_board(board) # This may not need a variable passed into it.
 
@@ -310,7 +339,3 @@ while True:
 ### When the loop ends
 #########################
 print "\n\nGame Over!! \n" + player_list[whose_turn], "reached", points_goal, "in", b, "turns."
-
-
-
-
